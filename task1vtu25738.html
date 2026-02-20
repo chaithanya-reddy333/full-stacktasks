@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Registration</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        padding: 20px;
+    }
+
+    .container {
+        width: 420px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 10px;
+        margin: 6px 0 12px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #0056b3;
+    }
+
+    table {
+        width: 100%;
+        margin-top: 30px;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background: #007bff;
+        color: white;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Student Registration</h2>
+
+    <form id="studentForm">
+        <label>Name</label>
+        <input type="text" id="name" required>
+
+        <label>Email</label>
+        <input type="email" id="email" required>
+
+        <label>Date of Birth</label>
+        <input type="date" id="dob" required>
+
+        <label>Department</label>
+        <select id="department" required>
+            <option value="">Select</option>
+            <option>CSE</option>
+            <option>ECE</option>
+            <option>EEE</option>
+            <option>Mechanical</option>
+            <option>Civil</option>
+        </select>
+
+        <label>Phone</label>
+        <input type="tel" id="phone" pattern="[0-9]{10}" required>
+
+        <button type="submit">Register</button>
+    </form>
+</div>
+
+<h2 style="text-align:center;">Registered Students</h2>
+
+<table id="studentTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>DOB</th>
+            <th>Department</th>
+            <th>Phone</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+// ---------- LOAD DATA ----------
+function loadStudents() {
+    const students = JSON.parse(localStorage.getItem("students")) || [];
+    const table = document.querySelector("#studentTable tbody");
+    table.innerHTML = "";
+
+    students.forEach(s => {
+        const row = `
+            <tr>
+                <td>${s.name}</td>
+                <td>${s.email}</td>
+                <td>${s.dob}</td>
+                <td>${s.department}</td>
+                <td>${s.phone}</td>
+            </tr>
+        `;
+        table.innerHTML += row;
+    });
+}
+
+// ---------- FORM SUBMIT ----------
+document.getElementById("studentForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const student = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        dob: document.getElementById("dob").value,
+        department: document.getElementById("department").value,
+        phone: document.getElementById("phone").value
+    };
+
+    const students = JSON.parse(localStorage.getItem("students")) || [];
+    students.push(student);
+    localStorage.setItem("students", JSON.stringify(students));
+
+    this.reset();
+    loadStudents();
+});
+
+// ---------- INITIAL LOAD ----------
+loadStudents();
+</script>
+
+</body>
+</html>

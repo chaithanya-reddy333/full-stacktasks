@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Order Management Dashboard</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        padding: 20px;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    .stats {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        background: white;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 0 8px rgba(0,0,0,0.1);
+        min-width: 220px;
+        text-align: center;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background: #007bff;
+        color: white;
+    }
+
+    button {
+        padding: 8px 12px;
+        margin-bottom: 15px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #0056b3;
+    }
+</style>
+</head>
+<body>
+
+<h2>🛒 Order Management Dashboard</h2>
+
+<div class="stats">
+    <div class="card">
+        <h3>Highest Value Order</h3>
+        <p id="highestOrder">--</p>
+    </div>
+
+    <div class="card">
+        <h3>Most Active Customer</h3>
+        <p id="activeCustomer">--</p>
+    </div>
+</div>
+
+<button onclick="sortByAmount()">ORDER BY Amount ↓</button>
+
+<table>
+    <thead>
+        <tr>
+            <th>Customer Name</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Amount</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody id="orderTable"></tbody>
+</table>
+
+<script>
+// ================= TABLES =================
+
+// Customers table
+const customers = [
+    {id: 1, name: "Amit"},
+    {id: 2, name: "Priya"},
+    {id: 3, name: "Rahul"}
+];
+
+// Products table
+const products = [
+    {id: 1, name: "Laptop", price: 50000},
+    {id: 2, name: "Mobile", price: 20000},
+    {id: 3, name: "Headphones", price: 2000}
+];
+
+// Orders table
+let orders = [
+    {id: 1, customer_id: 1, product_id: 1, qty: 1, date: "2025-02-01"},
+    {id: 2, customer_id: 2, product_id: 2, qty: 2, date: "2025-02-03"},
+    {id: 3, customer_id: 1, product_id: 3, qty: 3, date: "2025-02-05"},
+    {id: 4, customer_id: 3, product_id: 1, qty: 1, date: "2025-02-07"},
+    {id: 5, customer_id: 1, product_id: 2, qty: 1, date: "2025-02-10"}
+];
+
+// ================= JOIN =================
+function getJoinedData() {
+    return orders.map(order => {
+        const customer = customers.find(c => c.id === order.customer_id);
+        const product = products.find(p => p.id === order.product_id);
+
+        const amount = product.price * order.qty;
+
+        return {
+            customerName: customer.name,
+            productName: product.name,
+            qty: order.qty,
+            amount: amount,
+            date: order.date
+        };
+    });
+}
+
+// ================= DISPLAY =================
+function displayOrders(data) {
+    const tbody = document.getElementById("orderTable");
+    tbody.innerHTML = "";
+
+    data.forEach(o => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${o.customerName}</td>
+                <td>${o.productName}</td>
+                <td>${o.qty}</td>
+                <td>₹${o.amount}</td>
+                <td>${o.date}</td>
+            </tr>
+        `;
+    });
+}
+
+// ================= SUBQUERY =================
+// Highest value order
+function findHighestOrder(data) {
+    const maxOrder = data.reduce((max, o) =>
+        o.amount > max.amount ? o : max
+    );
+    document.getElementById("highestOrder").innerText =
+        `${maxOrder.customerName} (₹${maxOrder.amount})`;
+}
+
+// Most active customer
+function findMostActiveCustomer() {
+    const counts = {};
+
+    orders.forEach(o => {
+        counts[o.customer_id] = (counts[o.customer_id] || 0) + 1;
+    });
+
+    let maxId = Object.keys(counts).reduce((a, b) =>
+        counts[a] > counts[b] ? a : b
+    );
+
+    const customer = customers.find(c => c.id == maxId);
+    document.getElementById("activeCustomer").innerText =
+        `${customer.name} (${counts[maxId]} orders)`;
+}
+
+// ================= ORDER BY =================
+function sortByAmount() {
+    const joined = getJoinedData();
+    joined.sort((a, b) => b.amount - a.amount);
+    displayOrders(joined);
+}
+
+// ================= INIT =================
+const joinedData = getJoinedData();
+displayOrders(joinedData);
+findHighestOrder(joinedData);
+findMostActiveCustomer();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Dashboard</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        padding: 20px;
+    }
+
+    h2 {
+        text-align: center;
+    }
+
+    .controls {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    select, button {
+        padding: 8px 12px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        cursor: pointer;
+    }
+
+    button {
+        background: #007bff;
+        color: white;
+        border: none;
+    }
+
+    button:hover {
+        background: #0056b3;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    th, td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background: #007bff;
+        color: white;
+    }
+
+    .stats {
+        margin-top: 25px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+    }
+</style>
+</head>
+<body>
+
+<h2>Student Data Dashboard</h2>
+
+<div class="controls">
+    <select id="filterDept">
+        <option value="all">Filter by Department</option>
+        <option>CSE</option>
+        <option>ECE</option>
+        <option>EEE</option>
+        <option>Mechanical</option>
+        <option>Civil</option>
+    </select>
+
+    <button onclick="sortByName()">Sort by Name</button>
+    <button onclick="sortByDate()">Sort by DOB</button>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>DOB</th>
+            <th>Department</th>
+            <th>Phone</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody"></tbody>
+</table>
+
+<div class="stats">
+    <h3>📊 Students Count per Department</h3>
+    <ul id="deptCount"></ul>
+</div>
+
+<script>
+// -------- SAMPLE DATA (auto if empty) --------
+if (!localStorage.getItem("students")) {
+    const sample = [
+        {name:"Amit", email:"amit@gmail.com", dob:"2002-05-10", department:"CSE", phone:"9876543210"},
+        {name:"Priya", email:"priya@gmail.com", dob:"2001-11-20", department:"ECE", phone:"9123456780"},
+        {name:"Rahul", email:"rahul@gmail.com", dob:"2003-02-15", department:"CSE", phone:"9988776655"},
+        {name:"Sneha", email:"sneha@gmail.com", dob:"2000-08-30", department:"EEE", phone:"9090909090"}
+    ];
+    localStorage.setItem("students", JSON.stringify(sample));
+}
+
+let students = JSON.parse(localStorage.getItem("students"));
+
+// -------- DISPLAY TABLE --------
+function displayTable(data) {
+    const tbody = document.getElementById("tableBody");
+    tbody.innerHTML = "";
+
+    data.forEach(s => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${s.name}</td>
+                <td>${s.email}</td>
+                <td>${s.dob}</td>
+                <td>${s.department}</td>
+                <td>${s.phone}</td>
+            </tr>
+        `;
+    });
+
+    updateCounts(data);
+}
+
+// -------- SORT BY NAME --------
+function sortByName() {
+    students.sort((a, b) => a.name.localeCompare(b.name));
+    applyFilter();
+}
+
+// -------- SORT BY DATE --------
+function sortByDate() {
+    students.sort((a, b) => new Date(a.dob) - new Date(b.dob));
+    applyFilter();
+}
+
+// -------- FILTER --------
+document.getElementById("filterDept").addEventListener("change", applyFilter);
+
+function applyFilter() {
+    const dept = document.getElementById("filterDept").value;
+
+    let filtered = students;
+
+    if (dept !== "all") {
+        filtered = students.filter(s => s.department === dept);
+    }
+
+    displayTable(filtered);
+}
+
+// -------- COUNT PER DEPARTMENT --------
+function updateCounts(data) {
+    const counts = {};
+
+    data.forEach(s => {
+        counts[s.department] = (counts[s.department] || 0) + 1;
+    });
+
+    const list = document.getElementById("deptCount");
+    list.innerHTML = "";
+
+    for (let dept in counts) {
+        list.innerHTML += `<li>${dept}: ${counts[dept]}</li>`;
+    }
+}
+
+// -------- INITIAL LOAD --------
+applyFilter();
+</script>
+
+</body>
+</html>

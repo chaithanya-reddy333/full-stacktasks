@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Payment Simulation</h2>
+<button onclick="pay()">Pay 500</button>
+<p id="result"></p>
+
+<script>
+let userBalance=1000;
+let merchantBalance=2000;
+
+function pay(){
+if(userBalance>=1000){
+userBalance-=1000;
+merchantBalance+=1000;
+result.innerHTML="Payment Success<br>User:"+userBalance+"<br>Merchant:"+merchantBalance;
+}else{
+result.innerHTML="Payment Failed";
+}
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Activity Log</h2>
+<button onclick="add()">Add Activity</button>
+<div id="log"></div>
+
+<script>
+let logs=[];
+
+function add(){
+let today=new Date().toLocaleDateString();
+logs.push(today);
+show();
+}
+
+function show(){
+let count={};
+logs.forEach(d=>count[d]=(count[d]||0)+1);
+
+let text="";
+for(let d in count){
+text+=d+" : "+count[d]+"<br>";
+}
+log.innerHTML=text;
+}
+</script>
+
+</body>
+</html>
